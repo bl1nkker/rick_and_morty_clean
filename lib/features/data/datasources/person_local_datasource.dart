@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class PersonLocalDatasource {
   Future<List<PersonModel>> getLastPersonsFromCache();
+  Future<List<PersonModel>> searchPersons(String query);
   Future<void> personsToCache(List<PersonModel> persons);
 }
 
@@ -19,6 +20,19 @@ class PersonLocalDatasourceImpl implements PersonLocalDatasource {
   Future<List<PersonModel>> getLastPersonsFromCache() {
     final jsonPersonsList = sharedPreferences.getStringList(kCachedPersonsList);
     if (jsonPersonsList != null) {
+      return Future.value(jsonPersonsList
+          .map((jsonPerson) => PersonModel.fromJson(jsonDecode(jsonPerson)))
+          .toList());
+    } else {
+      throw CacheException(message: 'Exception on getLastPersonsFromCache');
+    }
+  }
+
+  @override
+  Future<List<PersonModel>> searchPersons(String query) {
+    final jsonPersonsList = sharedPreferences.getStringList(kCachedPersonsList);
+    if (jsonPersonsList != null) {
+      // Add Search by query
       return Future.value(jsonPersonsList
           .map((jsonPerson) => PersonModel.fromJson(jsonDecode(jsonPerson)))
           .toList());
